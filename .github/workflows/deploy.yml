@@ -1,0 +1,39 @@
+ name: Deploy to GitHub Pages
+    2
+    3     on:
+    4       # 當有程式碼推送到 main 分支時執行
+    5       push:
+    6         branches: ["main"]
+    7       # 讓您可以在 Actions 頁面手動觸發此工作流程
+    8       workflow_dispatch:
+    9
+   10     # 設定 GITHUB_TOKEN 的權限，以允許部署到 GitHub Pages
+   11     permissions:
+   12       contents: read
+   13       pages: write
+   14       id-token: write
+   15
+   16     # 只允許一個並行的部署
+   17     concurrency:
+   18       group: "pages"
+   19       cancel-in-progress: false
+   20
+   21     jobs:
+   22       deploy:
+   23         environment:
+   24           name: github-pages
+   25           url: ${{ steps.deployment.outputs.page_url }}
+   26         runs-on: ubuntu-latest
+   27         steps:
+   28           - name: Checkout
+   29             uses: actions/checkout@v4
+   30           - name: Setup Pages
+   31             uses: actions/configure-pages@v4
+   32           - name: Upload artifact
+   33             uses: actions/upload-pages-artifact@v3
+   34             with:
+   35               # 上傳整個專案根目錄
+   36               path: '.'
+   37           - name: Deploy to GitHub Pages
+   38             id: deployment
+   39             uses: actions/deploy-pages@v4
